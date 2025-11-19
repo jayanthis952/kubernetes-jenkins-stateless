@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: stateless-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: stateless-app
+  ports:
+    - port: 80
+      targetPort: 80
+

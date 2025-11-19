@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stateless-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: stateless-app
+  template:
+    metadata:
+      labels:
+        app: stateless-app
+    spec:
+      containers:
+      - name: stateless-app
+        image: jayanthis952/stateless-app:latest
+        ports:
+        - containerPort: 80
+
