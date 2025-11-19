@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         REGISTRY = "jayanthim/stateless-app"
-        IMAGE_TAG = "latest"
+        IMAGE_TAG = "${GIT_COMMIT}"
     }
 
     stages {
@@ -34,7 +34,8 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                    kubectl apply -f k8s/deployment.yaml
+                    # Replace image in deployment with new tag
+                    kubectl set image deployment/stateless-deploy stateless-container=$REGISTRY:$IMAGE_TAG
                     kubectl apply -f k8s/service.yml
                 """
             }
