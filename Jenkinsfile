@@ -3,14 +3,17 @@ pipeline {
 
     environment {
         REGISTRY = "jayanthim/stateless-app"
-        IMAGE_TAG = "${GIT_COMMIT}"
     }
 
     stages {
         stage('Clone Repo') {
             steps {
+                // Checkout the repo and get GIT_COMMIT
                 git branch: 'main',
                     url: 'https://github.com/jayanthis952/kubernetes-jenkins-stateless.git'
+                script {
+                    env.IMAGE_TAG = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                }
             }
         }
 
@@ -34,8 +37,9 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 sh """
-                    # Replace image in deployment with new tag
-                    kubectl set image deployment/stateless-deploy stateless-container=$REGISTRY:$IMAGE_TAG
+                    # Update deployment with new image
+                    kubectl set image deployment/stateless-deploy stateless-app=$REGISTRY:$IMAGE_TAG
+                    kubectl rollout status deployment/stateless-deploy
                     kubectl apply -f k8s/service.yml
                 """
             }
@@ -43,6 +47,6 @@ pipeline {
     }
 
     triggers {
-        pollSCM('*/2 * * * *')
+        pollSCM('*/2 * * * *') // Poll Git every 2 minutes for changes
     }
 }
