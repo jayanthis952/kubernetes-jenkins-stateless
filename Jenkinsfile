@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY = "jayanthis952/stateless-app"
+        REGISTRY = "jayanthim/stateless-app"
         IMAGE_TAG = "latest"
     }
 
@@ -22,9 +22,9 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                withCredentials([string(credentialsId: 'dockerhub-pass', variable: 'PASS')]) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-pass', usernameVariable: 'USER', passwordVariable: 'PASS')]) {
                     sh """
-                        echo $PASS | docker login -u jayanthis952 --password-stdin
+                        echo $PASS | docker login -u $USER --password-stdin
                         docker push $REGISTRY:$IMAGE_TAG
                     """
                 }
@@ -45,4 +45,3 @@ pipeline {
         pollSCM('*/2 * * * *')
     }
 }
-
